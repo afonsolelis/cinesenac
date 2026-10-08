@@ -1,0 +1,123 @@
+// ============================================================
+// CineSenac — Modelagem de Dados
+// Formato: DBML (dbdiagram.io)
+// Importe este arquivo em https://dbdiagram.io/d para visualizar
+// ============================================================
+
+// ---------- Enums ----------
+
+enum faixa_etaria {
+  LIVRE
+  DEZ_ANOS [note: '10 anos']
+  DOZE_ANOS [note: '12 anos']
+  QUATORZE_ANOS [note: '14 anos']
+  DEZESSEIS_ANOS [note: '16 anos']
+  DEZOITO_ANOS [note: '18 anos']
+}
+
+enum nacionalidade_filme {
+  NACIONAL        // RN04 — cota de tela
+  INTERNACIONAL   // RN04 — cota de tela
+}
+
+// ---------- Cliente ----------
+
+Table clientes {
+  id int [pk, increment]
+  nome varchar [not null]
+  email varchar [unique, not null]
+  idade int [not null]
+  logradouro varchar [not null]
+  numero varchar [not null]
+  complemento varchar [null]
+  bairro varchar [not null]
+  cidade varchar [not null]
+  estado varchar(2) [not null]
+  cep varchar(9) [not null]
+  criado_em datetime [default: `now()`]
+
+  Note: 'Endereço incorporado à tabela do cliente (relação 1:1)'
+}
+
+// ---------- Catálogo (Gestor) ----------
+
+Table filmes {
+  id int [pk, increment]
+  titulo varchar [not null]
+  duracao_minutos int [not null]
+  genero varchar [not null]
+  sinopse text [not null]
+  cartaz_url varchar [not null, note: 'URL da imagem do cartaz']
+  faixa_etaria faixa_etaria [not null]
+  elenco text [not null, note: 'Especificação do elenco']
+  nacionalidade nacionalidade_filme [not null, note: 'Necessário para a RN04 (cota de filme nacional)']
+  criado_em datetime [default: `now()`]
+}
+
+Table salas {
+  id int [pk, increment]
+  nome varchar [not null]
+  qtd_assentos int [not null, note: 'Quantidade de assentos da sala']
+  hora_abertura time [not null, note: 'Horário de funcionamento — abertura']
+  hora_fechamento time [not null, note: 'Horário de funcionamento — fechamento']
+  especificacao_tecnica varchar [not null, note: 'Ex.: 3D, IMAX, Dolby Atmos']
+  criado_em datetime [default: `now()`]
+}
+
+Table assentos {
+  id int [pk, increment]
+  sala_id int [not null]
+  codigo varchar [not null, note: 'Identificação do assento. Ex.: A1, B7']
+
+  indexes {
+    (sala_id, codigo) [unique]
+  }
+}
+
+// ---------- Programação (Gestor) ----------
+
+Table sessoes {
+  id int [pk, increment]
+  filme_id int [not null]
+  sala_id int [not null]
+  data_hora_inicio datetime [not null]
+  duracao_minutos int [not null]
+  valor_ingresso decimal(10,2) [not null, note: 'Preço do ingresso']
+  criado_em datetime [default: `now()`]
+
+  Note: 'Duração + data/hora de início permitem detectar conflito de horários entre sessões (RN03)'
+}
+
+// ---------- Reservas (Cliente) ----------
+
+Table reservas {
+  id int [pk, increment]
+  cliente_id int [not null]
+  sessao_id int [not null]
+  assento_id int [not null]
+  criado_em datetime [default: `now()`]
+
+  indexes {
+    (sessao_id, assento_id) [unique, note: 'RN01 — cada assento só pode ser reservado uma vez por sessão']
+  }
+
+  Note: 'Cada reserva corresponde a um assento válido (RN01). Um cliente pode ter várias reservas na mesma sessão (RN02).'
+}
+
+// ---------- Relacionamentos ----------
+
+Ref: assentos.sala_id > salas.id
+Ref: sessoes.filme_id > filmes.id
+Ref: sessoes.sala_id > salas.id
+Ref: reservas.cliente_id > clientes.id
+Ref: reservas.sessao_id > sessoes.id
+Ref: reservas.assento_id > assentos.id
+
+// ---------- Regras de Negócio mapeadas ----------
+//
+// RN01 — Assento válido: toda reserva ocupa 1 assento válido (unique sessao_id + assento_id)
+// RN02 — Múltiplos assentos: reservas permite várias linhas por (cliente_id, sessao_id)
+// RN03 — Conflito de sessões: validado na aplicação comparando data_hora_inicio +
+//        duracao_minutos das sessões já reservadas pelo cliente
+// RN04 — Cota de filme nacional: validada na aplicação usando filmes.nacionalidade —
+//        todo dia de programação deve ter ao menos 1 sessão de filme NACIONAL
