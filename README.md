@@ -24,6 +24,10 @@ O modelo relacional está em [prd/dbdiagram.dbml](prd/dbdiagram.dbml), no format
 
 Os requisitos funcionais estão documentados em [prd/requisitos-funcionais.md](prd/requisitos-funcionais.md), com matriz de rastreabilidade para as regras de negócio (RN01–RN04).
 
+## Fluxos de Sequência
+
+Os principais fluxos do sistema estão documentados em UML de sequência (Mermaid) em [prd/fluxos-sequencia.md](prd/fluxos-sequencia.md): autenticação, cadastro do cliente, gestão de filmes/salas/sessões, reserva de assentos e administração.
+
 ## Estrutura do Projeto
 
 ```
@@ -33,6 +37,7 @@ cinesenac/
 └── prd/
     ├── dbdiagram.dbml
     ├── requisitos-funcionais.md
+    ├── fluxos-sequencia.md
     └── personas/
         ├── admin-sistema.md
         ├── gestor.md
@@ -44,5 +49,5 @@ cinesenac/
 - [x] Definição de personas e objetivos
 - [x] Requisitos funcionais
 - [x] Modelagem de dados
-- [ ] Fluxos de navegação
+- [x] Fluxos (UML de sequência)
 - [ ] Desenvolvimento
