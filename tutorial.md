@@ -14,15 +14,20 @@ Sistema de gestão de sessões de cinema com três perfis de acesso:
 
 ```
 cinesenac/
+├── AGENTS.md
 ├── README.md
 ├── tutorial.md
-└── prd/
-    ├── dbdiagram.dbml
-    ├── requisitos-funcionais.md
-    └── personas/
-        ├── admin-sistema.md
-        ├── gestor.md
-        └── cliente.md
+├── prd/
+│   ├── dbdiagram.dbml
+│   ├── requisitos-funcionais.md
+│   ├── fluxos-sequencia.md
+│   └── personas/
+│       ├── admin-sistema.md
+│       ├── gestor.md
+│       └── cliente.md
+└── .aiox-core/development/skills/
+    ├── analyze-docs/SKILL.md
+    └── update-tutorial/SKILL.md
 ```
 
 ---
@@ -186,6 +191,61 @@ Encerrando com a **matriz de rastreabilidade** RN01–RN04 → RFs que as atende
 
 ---
 
+## Passo 10 — Fluxos em UML de sequência (Mermaid)
+
+### Prompt
+
+> "agora, olhando os fluxos, crie uma documentação mermaid com os flucos em uml de sequencia"
+
+### Resultado
+
+Criação de `prd/fluxos-sequencia.md` com **8 diagramas de sequência Mermaid** (ator → Frontend → API → Banco):
+
+1. Autenticação (RF01, RF02)
+2. Cadastro do cliente (RF04, RF05)
+3. Cadastro de filme (RF08)
+4. Cadastro de sala (RF11, RF13)
+5. Cadastro de sessão (RF14, RF15, RN04)
+6. Reserva de assentos (RF20–RF25, RN01–RN03)
+7. Consulta das próprias reservas (RF26)
+8. Gestão de usuários (Admin) (RF27, RF30)
+
+Cada diagrama traz os caminhos de sucesso e de erro, e o documento fecha com uma tabela de cobertura por fluxo.
+
+---
+
+## Passo 11 — Correção de renderização, skill `analyze-docs` e AGENTS.md
+
+### Prompt
+
+> "na parte 5 a renderizaçao esta quebrada, ajuste, e coloque uma skill de sempre analisar uma documentão ao finalizar"
+
+### Resultado
+
+- **Correção:** o diagrama 5 (cadastro de sessão) não renderizava porque a mensagem continha `;` — o Mermaid trata ponto e vírgula como separador de statements. Substituído por vírgula.
+- Criação da skill `.aiox-core/development/skills/analyze-docs/SKILL.md` — portão de revisão de documentação a executar **antes de finalizar** qualquer tarefa que crie ou edite docs: valida links relativos, blocos de código (Mermaid sem `;`, fences balanceados, DBML), consistência de IDs (RNxx/RFxx), estrutura do README e ortografia, entregando um relatório.
+- Criação do `AGENTS.md` registrando as regras do projeto: sempre consultar `.aiox-core/` antes de qualquer tarefa e sempre executar `analyze-docs` ao finalizar documentação.
+- A skill foi aplicada na hora: os 8 diagramas foram verificados, todos os links resolvem e o README está em sync.
+
+**Aprendizado:** um único caractere (`;`) dentro de uma linha de diagrama Mermaid quebra a renderização inteira — documentação sem verificação automatizada esconde esses defeitos.
+
+---
+
+## Passo 12 — Skill `update-tutorial`
+
+### Prompt
+
+> "crei uma skill para cada ação atulizar o tutorial, e ja aproveite e atualize agora com os fluxos"
+
+### Resultado
+
+- Criação da skill `.aiox-core/development/skills/update-tutorial/SKILL.md` — registra cada novo passo no tutorial com o prompt do usuário **verbatim**, atualiza a árvore da estrutura e os próximos passos, e roda `analyze-docs` antes de terminar.
+- Aplicação imediata: este próprio passo (10, 11 e 12) foi gravado e a árvore da estrutura atualizada.
+
+**Aprendizado:** quando uma ação se repete a cada tarefa ("atualize o tutorial"), transformá-la em skill garante que o histórico do projeto nunca fique para trás.
+
+---
+
 ## Resumo do método
 
 1. **Personas primeiro** — quem usa o sistema e com quais objetivos
@@ -193,6 +253,8 @@ Encerrando com a **matriz de rastreabilidade** RN01–RN04 → RFs que as atende
 3. **Modelagem de dados** — entidades e campos derivados das personas e das RNs
 4. **Jornadas** — o caminho de cada persona nas telas do front end
 5. **Requisitos funcionais** — o que a aplicação deve fazer para atender às jornadas, com matriz de rastreabilidade
+6. **Fluxos de sequência** — como Frontend, API e Banco conversam em cada fluxo
+7. **Skills do framework** — `analyze-docs` (gate de docs) e `update-tutorial` (histórico vivo) mantêm a qualidade e a memória do projeto
 
 ## Próximos passos sugeridos
 
