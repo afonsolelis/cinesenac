@@ -1,0 +1,78 @@
+# Pipeline de integração contínua do CineSenac.
+# Job 1: testes unitários e BDD com cobertura, relatório e gate de cobertura.
+# Job 2: constrói a imagem de contêiner e verifica a imagem real com testcontainers.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  testes:
+    name: Testes, BDD e cobertura
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Instalar dependências (lock)
+        run: uv sync --locked
+
+      - name: Rodar testes com cobertura (gate de 85%)
+        run: >
+          uv run pytest -m "not container"
+          --cov --cov-fail-under=85
+          --cov-report=term
+          --cov-report=json:reports/coverage.json
+          --cov-report=html:reports/htmlcov
+          --cov-report=xml:reports/coverage.xml
+
+      - name: Gerar relatório de cobertura
+        if: always()
+        run: uv run python -m tests.bdd.gerar_relatorio
+
+      - name: Publicar relatório no resumo do job
+        if: always()
+        run: cat prd/qualidade/relatorio-cobertura.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Enviar artefatos de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura
+          path: |
+            reports/htmlcov/
+            reports/coverage.xml
+            prd/qualidade/relatorio-cobertura.md
+          retention-days: 30
+
+  conteineres:
+    name: Imagem de contêiner (testcontainers)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Instalar dependências (lock)
+        run: uv sync --locked
+
+      - name: Construir a imagem
+        run: docker build -t cinesenac:ci .
+
+      - name: Verificar a imagem com testcontainers
+        env:
+          CINESENAC_IMAGE: cinesenac:ci
+        run: uv run pytest -m container -v

@@ -27,3 +27,14 @@ Thumbs.db
 .aiox-core/local/
 .claude/settings.local.json
 .aiox/install-log.txt
+
+# Python (CineSenac)
+.venv/
+__pycache__/
+.pytest_cache/
+*.db
+*.db-journal
+reports/
+coverage.xml
+.coverage
+htmlcov/

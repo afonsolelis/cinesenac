@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block titulo %}Painel do gestor{% endblock %}
+{% block conteudo %}
+<h1>Painel do gestor</h1>
+{% if erro %}<p class="alerta" role="alert">{{ erro }}</p>{% endif %}
+{% if aviso == "cota_nacional_pendente" %}
+  <p class="aviso" role="status">Sessão criada. O dia ainda não tem filme nacional: a publicação fica bloqueada até que haja uma sessão nacional (RN04).</p>
+{% endif %}
+
+<section aria-labelledby="cota">
+  <h2 id="cota">Cota de filme nacional</h2>
+  <p>Dia {{ cota.data }}: <strong>{{ 'atendida' if cota.atendida else 'pendente' }}</strong>
+     ({{ cota.sessoes_nacionais }} sessão(ões) nacional(is))</p>
+  <form method="post" action="/gestor/publicar" class="em-linha">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="dia-publicar">Dia</label>
+    <input id="dia-publicar" name="dia" type="date" value="{{ dia.isoformat() }}" required>
+    <button type="submit">Publicar dia</button>
+  </form>
+</section>
+
+<section aria-labelledby="novo-filme">
+  <h2 id="novo-filme">Novo filme</h2>
+  <form method="post" action="/gestor/filmes" class="formulario">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="titulo">Título</label><input id="titulo" name="titulo" required>
+    <label for="duracao">Duração (minutos)</label><input id="duracao" name="duracao_minutos" type="number" min="1" required>
+    <label for="genero">Gênero</label><input id="genero" name="genero" required>
+    <label for="sinopse">Sinopse</label><textarea id="sinopse" name="sinopse" required></textarea>
+    <label for="cartaz">URL do cartaz</label><input id="cartaz" name="cartaz_url" type="url" required>
+    <label for="faixa">Faixa etária</label>
+    <select id="faixa" name="faixa_etaria" required>
+      <option value="LIVRE">Livre</option><option value="DEZ_ANOS">10 anos</option>
+      <option value="DOZE_ANOS">12 anos</option><option value="QUATORZE_ANOS">14 anos</option>
+      <option value="DEZESSEIS_ANOS">16 anos</option><option value="DEZOITO_ANOS">18 anos</option>
+    </select>
+    <label for="elenco">Elenco</label><textarea id="elenco" name="elenco" required></textarea>
+    <label for="nacionalidade">Nacionalidade</label>
+    <select id="nacionalidade" name="nacionalidade" required>
+      <option value="NACIONAL">Nacional</option><option value="INTERNACIONAL">Internacional</option>
+    </select>
+    <button type="submit">Cadastrar filme</button>
+  </form>
+</section>
+
+<section aria-labelledby="nova-sessao">
+  <h2 id="nova-sessao">Nova sessão</h2>
+  <form method="post" action="/gestor/sessoes" class="formulario">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="filme">Filme</label>
+    <select id="filme" name="filme_id" required>
+      {% for f in filmes %}<option value="{{ f.id }}">{{ f.titulo }}</option>{% endfor %}
+    </select>
+    <label for="sala">Sala</label>
+    <select id="sala" name="sala_id" required>
+      {% for s in salas %}<option value="{{ s.id }}">{{ s.nome }}</option>{% endfor %}
+    </select>
+    <label for="inicio">Início</label><input id="inicio" name="data_hora_inicio" type="datetime-local" required>
+    <label for="dur">Duração (minutos)</label><input id="dur" name="duracao_minutos" type="number" min="1" required>
+    <label for="valor">Valor do ingresso (R$)</label><input id="valor" name="valor_ingresso" inputmode="decimal" required>
+    <button type="submit">Cadastrar sessão</button>
+  </form>
+</section>
+
+<section aria-labelledby="sessoes">
+  <h2 id="sessoes">Sessões</h2>
+  <ul class="lista-sessoes">
+    {% for s in sessoes %}
+    <li class="cartao">{{ s.filme.titulo }} · {{ s.sala.nome }} · {{ s.data_hora_inicio|data_hora }}{% if s.cancelada %} (cancelada){% endif %}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

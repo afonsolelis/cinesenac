@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block titulo %}Escolher assentos{% endblock %}
+{% block conteudo %}
+<h1>{{ mapa.sessao.filme.titulo }}</h1>
+<p>{{ mapa.sessao.sala.nome }} · {{ mapa.sessao.data_hora_inicio|data_hora }} · {{ mapa.sessao.valor_ingresso|moeda }} por assento</p>
+{% if erro %}<p class="alerta" role="alert">{{ erro }}</p>{% endif %}
+<form method="post" action="/sessoes/{{ mapa.sessao.id }}/reservas" class="formulario">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <input type="hidden" name="chave" value="{{ chave }}">
+  <fieldset>
+    <legend>Escolha um ou mais assentos livres</legend>
+    <div class="mapa">
+      {% for a in mapa.assentos %}
+      <label class="assento {{ 'ocupado' if a.ocupado else 'livre' }}">
+        <input type="checkbox" name="assentos" value="{{ a.codigo }}"
+               {% if a.ocupado %}disabled{% endif %}
+               aria-label="{{ rotulo_acessivel(a.codigo, 'ocupado' if a.ocupado else 'livre') }}">
+        <span aria-hidden="true">{{ a.codigo }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </fieldset>
+  <button type="submit">Confirmar reserva</button>
+</form>
+{% endblock %}

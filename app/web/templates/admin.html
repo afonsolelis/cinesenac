@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block titulo %}Painel administrativo{% endblock %}
+{% block conteudo %}
+<h1>Painel administrativo</h1>
+{% if erro %}<p class="alerta" role="alert">{{ erro }}</p>{% endif %}
+
+<section aria-labelledby="resumo">
+  <h2 id="resumo">Visão geral</h2>
+  <div class="indicadores">
+    <div class="cartao"><span>Usuários</span><strong>{{ resumo.usuarios }}</strong></div>
+    <div class="cartao"><span>Clientes</span><strong>{{ resumo.clientes }}</strong></div>
+    <div class="cartao"><span>Filmes</span><strong>{{ resumo.filmes }}</strong></div>
+    <div class="cartao"><span>Salas</span><strong>{{ resumo.salas }}</strong></div>
+    <div class="cartao"><span>Sessões</span><strong>{{ resumo.sessoes }}</strong></div>
+    <div class="cartao"><span>Reservas</span><strong>{{ resumo.reservas }}</strong></div>
+  </div>
+</section>
+
+<section aria-labelledby="usuarios">
+  <h2 id="usuarios">Usuários</h2>
+  <table>
+    <thead><tr><th scope="col">E-mail</th><th scope="col">Perfil</th><th scope="col">Situação</th><th scope="col">Ação</th></tr></thead>
+    <tbody>
+      {% for u in usuarios %}
+      <tr>
+        <td>{{ u.email }}</td>
+        <td>{{ u.perfil }}</td>
+        <td>{{ 'ativo' if u.ativo else 'desativado' }}</td>
+        <td>
+          {% if u.perfil != "admin" %}
+          <form method="post" action="/admin/usuarios/{{ u.id }}/ativo" class="em-linha">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="ativo" value="{{ 'false' if u.ativo else 'true' }}">
+            <button type="submit">{{ 'Desativar' if u.ativo else 'Ativar' }}</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section aria-labelledby="novo-gestor">
+  <h2 id="novo-gestor">Novo gestor</h2>
+  <form method="post" action="/admin/usuarios" class="formulario">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="email">E-mail</label><input id="email" name="email" type="email" required>
+    <label for="senha">Senha (mínimo de 12 caracteres)</label><input id="senha" name="senha" type="password" minlength="12" required>
+    <button type="submit">Criar gestor</button>
+  </form>
+</section>
+
+<section aria-labelledby="auditoria">
+  <h2 id="auditoria">Auditoria recente</h2>
+  <ul>
+    {% for r in auditoria %}<li>{{ r.ocorrido_em }} · {{ r.acao }} · {{ r.alvo }}</li>{% endfor %}
+  </ul>
+</section>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block titulo %}Reserva confirmada{% endblock %}
+{% block conteudo %}
+<h1>Reserva confirmada</h1>
+<dl class="resumo">
+  <dt>Filme</dt><dd>{{ reserva.filme.titulo }}</dd>
+  <dt>Sala</dt><dd>{{ reserva.sala.nome }}</dd>
+  <dt>Sessão</dt><dd>{{ reserva.data_hora_inicio|data_hora }}</dd>
+  <dt>Assentos</dt><dd>{% for r in reserva.reservas %}{{ r.assento }}{% if not loop.last %}, {% endif %}{% endfor %}</dd>
+  <dt>Valor total</dt><dd>{{ reserva.valor_total|moeda }}</dd>
+</dl>
+<a class="botao" href="/minhas-reservas">Ver minhas reservas</a>
+{% endblock %}

@@ -1,0 +1,11 @@
+.git
+.venv
+.aiox-core
+.github
+node_modules
+prd
+tests
+**/__pycache__
+*.db
+.env
+.env.*

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Programação{% endblock %} · CineSenac</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+  <header class="topo">
+    <a class="marca" href="/programacao">CineSenac</a>
+    <nav aria-label="Principal">
+      <a href="/programacao">Programação</a>
+      {% if usuario %}
+        {% if usuario.perfil == "cliente" %}
+          <a href="/minhas-reservas">Minhas reservas</a>
+          <a href="/minha-conta">Minha conta</a>
+        {% endif %}
+        {% if usuario.perfil in ["gestor", "admin"] %}<a href="/gestor">Gestor</a>{% endif %}
+        {% if usuario.perfil == "admin" %}<a href="/admin">Admin</a>{% endif %}
+        <form method="post" action="/sair" class="em-linha">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button type="submit">Sair</button>
+        </form>
+      {% else %}
+        <a href="/entrar">Entrar</a>
+        <a href="/cadastro">Criar conta</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main id="conteudo">
+    {% block conteudo %}{% endblock %}
+  </main>
+</body>
+</html>
