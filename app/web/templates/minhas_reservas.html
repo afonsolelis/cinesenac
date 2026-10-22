@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block titulo %}Minhas reservas{% endblock %}
+{% block conteudo %}
+<h1>Minhas reservas</h1>
+{% if not itens %}<p>Você ainda não tem reservas.</p>{% endif %}
+<ul class="lista-sessoes">
+  {% for r in itens %}
+  <li class="cartao">
+    <h2>{{ r.filme.titulo }}</h2>
+    <p>{{ r.data_hora_inicio|data_hora }} · assento {{ r.assento }} · {{ r.valor|moeda }}</p>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

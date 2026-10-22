@@ -2,7 +2,7 @@
 
 Requisitos funcionais da aplicação, derivados das jornadas e dos objetivos das personas ([prd/personas](personas)).
 
-**Convenções:** `RFxx` identifica o requisito. `RNxx` refere-se às regras de negócio declaradas nas personas (RN01–RN03 em [cliente](personas/cliente.md), RN04 em [gestor](personas/gestor.md)).
+**Convenções:** `RFxx` identifica o requisito. `RNxx` refere-se às regras de negócio declaradas nas personas (RN01–RN03 em [cliente](personas/cliente.md), RN04 em [gestor](personas/gestor.md)). Os requisitos não funcionais (`RNFxx`) estão em [requisitos-nao-funcionais.md](requisitos-nao-funcionais.md), que referencia os RFs aqui definidos.
 
 ## 1. Autenticação e Controle de Acesso
 

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block titulo %}Programação{% endblock %}
+{% block conteudo %}
+<h1>Programação</h1>
+{% if not itens %}
+  <p>Nenhuma sessão publicada no momento.</p>
+{% endif %}
+<ul class="lista-sessoes">
+  {% for s in itens %}
+  <li class="cartao">
+    <h2>{{ s.filme.titulo }}</h2>
+    <p>{{ s.sala.nome }} · {{ s.data_hora_inicio|data_hora }} · {{ s.valor_ingresso|moeda }}</p>
+    <a class="botao" href="/sessoes/{{ s.id }}">Escolher assentos</a>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

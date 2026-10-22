@@ -1,0 +1,47 @@
+[project]
+name = "cinesenac"
+version = "0.1.0"
+description = "Sistema de gestão de sessões de cinema (CineSenac)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "sqlalchemy>=2.0",
+    "jinja2>=3.1",
+    "argon2-cffi>=23.1",
+    "python-multipart>=0.0.9",
+    "itsdangerous>=2.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "httpx>=0.27",
+    "pytest-bdd>=9.0.0",
+    "pytest-cov>=7.1.0",
+    "testcontainers>=4.15.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"
+markers = [
+    "container: sobe a imagem de contêiner com testcontainers (requer Docker)",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.coverage.run]
+source = ["app"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
