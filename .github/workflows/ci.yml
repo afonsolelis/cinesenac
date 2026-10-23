@@ -1,5 +1,6 @@
 # Pipeline de integração contínua do CineSenac.
-# Job 1: testes unitários e BDD com cobertura, relatório e gate de cobertura.
+# Job 1: testes unitários e BDD com cobertura, relatório, gate de cobertura
+#        e análise no SonarQube Cloud.
 # Job 2: constrói a imagem de contêiner e verifica a imagem real com testcontainers.
 name: CI
 
@@ -19,6 +20,9 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Histórico completo: o Sonar usa para código novo e autoria das linhas.
+          fetch-depth: 0
 
       - uses: astral-sh/setup-uv@v6
         with:
@@ -35,6 +39,13 @@ jobs:
           --cov-report=json:reports/coverage.json
           --cov-report=html:reports/htmlcov
           --cov-report=xml:reports/coverage.xml
+
+      - name: Análise no SonarQube Cloud
+        # PRs de fork não recebem o secret, então a análise é pulada neles.
+        if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false)
+        uses: SonarSource/sonarqube-scan-action@v8
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Gerar relatório de cobertura
         if: always()

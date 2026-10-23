@@ -84,7 +84,7 @@ uv run python -m tests.bdd.gerar_relatorio           # relatório em prd/qualida
 docker build -t cinesenac:dev . && CINESENAC_IMAGE=cinesenac:dev uv run pytest -m container
 ```
 
-O relatório de cobertura está em [prd/qualidade/relatorio-cobertura.md](prd/qualidade/relatorio-cobertura.md). O pipeline de CI está em [.github/workflows/ci.yml](.github/workflows/ci.yml): um job roda os testes com gate de 85% de cobertura, e outro constrói a imagem e a verifica com testcontainers.
+O relatório de cobertura está em [prd/qualidade/relatorio-cobertura.md](prd/qualidade/relatorio-cobertura.md). O pipeline de CI está em [.github/workflows/ci.yml](.github/workflows/ci.yml): um job roda os testes com gate de 85% de cobertura e envia a análise ao SonarQube Cloud (configurada em `sonar-project.properties`), e outro constrói a imagem e a verifica com testcontainers.
 
 ### Como a documentação guia o código
 
@@ -118,7 +118,8 @@ cinesenac/
 │   └── web/                # páginas Jinja2, templates e CSS
 ├── tests/                  # suíte TDD (pytest), BDD (pytest-bdd) e contêiner (testcontainers)
 ├── features/               # cenários Gherkin em português
-├── .github/workflows/      # pipeline de CI (testes, cobertura, contêiner)
+├── .github/workflows/      # pipeline de CI (testes, cobertura, Sonar, contêiner)
+├── sonar-project.properties # análise do SonarQube Cloud
 └── prd/                    # documentação: fonte de verdade
     ├── dbdiagram.dbml
     ├── requisitos-funcionais.md
